@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     // Profile with mutual friends
     Route::get('/profile/{id}', [FriendController::class, 'profile'])->name('user.profile');
     Route::get('/friend-request/accept-from-search/{senderId}', [FriendController::class, 'acceptFromSearch'])->name('friend.request.accept.from.search');
+
     Route::view('/privacy-policy', 'privacy-policy');
     Route::view('/data-deletion', 'data-deletion');
 

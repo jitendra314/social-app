@@ -103,15 +103,19 @@ class FriendController extends Controller
 
     public function acceptFromSearch($senderId)
     {
-        $request = FriendRequest::where('sender_id', $senderId)
-                    ->where('receiver_id', auth()->id())
-                    ->where('accepted', false)
-                    ->firstOrFail();
+        $friendRequest = FriendRequest::where('sender_id', $senderId)
+            ->where('receiver_id', auth()->id())
+            ->where('accepted', false)
+            ->first();
 
-        $request->update(['accepted' => true]);
+        if ($friendRequest) {
+            $friendRequest->update(['accepted' => true]);
+            return back()->with('success', 'Friend request accepted.');
+        }
 
-        return redirect()->back()->with('success', 'Friend request accepted!');
+        return back()->with('error', 'Friend request not found.');
     }
+
 
 
 }

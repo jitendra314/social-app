@@ -21,9 +21,11 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-# Steps
+# Installation Steps
 
 git int
+
+Select master branch from branches.
 git clone https://github.com/jitendra314/social-app.git
 
 # Laravel Setup
@@ -38,7 +40,7 @@ npm run dev
 
     APP_NAME=Laravel
     APP_ENV=local
-    APP_KEY=base64:lvfdfnvIxhsgjhS3px7lCHvyhfC3X+Of4iJOtucNqDQ=
+    APP_KEY=base64:your-app-key
     APP_DEBUG=true
     APP_URL=http://localhost:8000
     ASSET_URL=http://localhost:8000

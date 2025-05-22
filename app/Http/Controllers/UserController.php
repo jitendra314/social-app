@@ -29,16 +29,22 @@ class UserController extends Controller
         // Build a map of existing requests/friendships
         $friendIds = [];
         $pendingIds = [];
+        $receivedRequestIds = [];
 
         foreach ($friends as $friend) {
             if ($friend->accepted) {
                 $friendIds[] = $friend->sender_id == $authUserId ? $friend->receiver_id : $friend->sender_id;
             } else {
-                $pendingIds[] = $friend->sender_id == $authUserId ? $friend->receiver_id : $friend->sender_id;
+                if ($friend->sender_id == $authUserId) {
+                    $pendingIds[] = $friend->receiver_id;
+                } elseif ($friend->receiver_id == $authUserId) {
+                    $receivedRequestIds[] = $friend->sender_id;
+                }
             }
         }
 
-        return view('users.index', compact('users', 'friendIds', 'pendingIds'));
+        return view('users.index', compact('users', 'friendIds', 'pendingIds', 'receivedRequestIds'));
+
     }
 
 }

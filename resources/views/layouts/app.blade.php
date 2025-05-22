@@ -40,8 +40,12 @@
                             <a class="nav-link @if (request()->routeIs('friend.requests')) active @endif"
                                 href="{{ route('friend.requests') }}">
                                 Friend Requests
+                                @if ($pendingRequestCount > 0)
+                                    <span class="badge bg-danger">{{ $pendingRequestCount }}</span>
+                                @endif
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link @if (request()->routeIs('friends.list')) active @endif"
                                 href="{{ route('friends.list') }}">

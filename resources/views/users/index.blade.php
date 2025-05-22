@@ -23,6 +23,9 @@
                                     <button class="btn btn-success btn-sm" disabled>Friends</button>
                                 @elseif (in_array($user->id, $pendingIds))
                                     <button class="btn btn-warning btn-sm" disabled>Request Sent</button>
+                                @elseif (in_array($user->id, $receivedRequestIds))
+                                    <a href="{{ route('friend.request.accept', $user->id) }}"
+                                        class="btn btn-sm btn-success">Accept</a>
                                 @else
                                     <a href="{{ route('friend.request.send', $user->id) }}"
                                         class="btn btn-primary btn-sm">Add Friend</a>

@@ -28,7 +28,11 @@ git clone https://github.com/jitendra314/social-app.git
 
 # Laravel Setup
 
+cd social-app
+
 Run : composer install
+npm install
+npm run dev
 
 .env file setup
 
@@ -98,8 +102,8 @@ Run : composer install
 
     VITE_APP_NAME="${APP_NAME}"
 
-    FACEBOOK_CLIENT_ID="1807674793151328"
-    FACEBOOK_CLIENT_SECRET="33ce68e2e0aa50940ac547dec4f78ced"
+    FACEBOOK_CLIENT_ID="YOUR-CLIENT-ID"
+    FACEBOOK_CLIENT_SECRET="YOUR-SECRET-KEY"
     FACEBOOK_REDIRECT_URI=https://9d71-2401-4900-570f-5be0-3485-7303-d27c-b12.ngrok-free.app/login/facebook/callback
 
 Artisan commands

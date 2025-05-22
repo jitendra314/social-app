@@ -11,15 +11,101 @@
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   [Simple, fast routing engine](https://laravel.com/docs/routing).
+-   [Powerful dependency injection container](https://laravel.com/docs/container).
+-   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+-   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+-   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+-   [Robust background job processing](https://laravel.com/docs/queues).
+-   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
+
+# Steps
+
+git int
+git clone https://github.com/jitendra314/social-app.git
+
+# Laravel Setup
+
+Run : composer install
+
+.env file setup
+
+    APP_NAME=Laravel
+    APP_ENV=local
+    APP_KEY=base64:lvfdfnvIxhsgjhS3px7lCHvyhfC3X+Of4iJOtucNqDQ=
+    APP_DEBUG=true
+    APP_URL=http://localhost:8000
+    ASSET_URL=http://localhost:8000
+    APP_LOCALE=en
+    APP_FALLBACK_LOCALE=en
+    APP_FAKER_LOCALE=en_US
+
+    APP_MAINTENANCE_DRIVER=file
+    # APP_MAINTENANCE_STORE=database
+
+    PHP_CLI_SERVER_WORKERS=4
+
+    BCRYPT_ROUNDS=12
+
+    LOG_CHANNEL=stack
+    LOG_STACK=single
+    LOG_DEPRECATIONS_CHANNEL=null
+    LOG_LEVEL=debug
+
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=social_app
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    SESSION_DRIVER=database
+    SESSION_LIFETIME=120
+    SESSION_ENCRYPT=false
+    SESSION_PATH=/
+    SESSION_DOMAIN=null
+
+    BROADCAST_CONNECTION=log
+    FILESYSTEM_DISK=local
+    QUEUE_CONNECTION=database
+
+    CACHE_STORE=database
+    # CACHE_PREFIX=
+
+    MEMCACHED_HOST=127.0.0.1
+
+    REDIS_CLIENT=phpredis
+    REDIS_HOST=127.0.0.1
+    REDIS_PASSWORD=null
+    REDIS_PORT=6379
+
+    MAIL_MAILER=log
+    MAIL_SCHEME=null
+    MAIL_HOST=127.0.0.1
+    MAIL_PORT=2525
+    MAIL_USERNAME=null
+    MAIL_PASSWORD=null
+    MAIL_FROM_ADDRESS="hello@example.com"
+    MAIL_FROM_NAME="${APP_NAME}"
+
+    AWS_ACCESS_KEY_ID=
+    AWS_SECRET_ACCESS_KEY=
+    AWS_DEFAULT_REGION=us-east-1
+    AWS_BUCKET=
+    AWS_USE_PATH_STYLE_ENDPOINT=false
+
+    VITE_APP_NAME="${APP_NAME}"
+
+    FACEBOOK_CLIENT_ID="1807674793151328"
+    FACEBOOK_CLIENT_SECRET="33ce68e2e0aa50940ac547dec4f78ced"
+    FACEBOOK_REDIRECT_URI=https://9d71-2401-4900-570f-5be0-3485-7303-d27c-b12.ngrok-free.app/login/facebook/callback
+
+Artisan commands
+
+php artisan optimize:clear
+php artisan migrate
 
 ## Learning Laravel
 
@@ -35,14 +121,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   **[Vehikl](https://vehikl.com)**
+-   **[Tighten Co.](https://tighten.co)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+-   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+-   **[Redberry](https://redberry.international/laravel-development)**
+-   **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 

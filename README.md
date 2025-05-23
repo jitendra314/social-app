@@ -21,22 +21,22 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-# Installation Steps
+## Installation Steps
 
-git int
+-   git init
+-   git clone https://github.com/jitendra314/social-app.git
 
-Select master branch from branches.
-git clone https://github.com/jitendra314/social-app.git
+## Laravel Setup
 
-# Laravel Setup
+-   cd social-app
 
-cd social-app
+Run Below commands:
 
-Run : composer install
-npm install
-npm run dev
+-   composer install
+-   npm install
+-   npm run dev
 
-.env file setup
+## .env file
 
     APP_NAME=Laravel
     APP_ENV=local
@@ -108,10 +108,10 @@ npm run dev
     FACEBOOK_CLIENT_SECRET="YOUR-SECRET-KEY"
     FACEBOOK_REDIRECT_URI=https://9d71-2401-4900-570f-5be0-3485-7303-d27c-b12.ngrok-free.app/login/facebook/callback
 
-Artisan commands
+## Artisan commands:
 
-php artisan optimize:clear
-php artisan migrate
+-   php artisan optimize:clear
+-   php artisan migrate
 
 ## Learning Laravel
 

@@ -77,6 +77,20 @@ class User extends Authenticatable
                     ->exists();
     }
 
+    public function getFriendStatus($otherUserId)
+    {
+        $authId = auth()->id();
 
+        $existing = FriendRequest::where(function ($q) use ($authId, $otherUserId) {
+            $q->where('sender_id', $authId)->where('receiver_id', $otherUserId);
+        })->orWhere(function ($q) use ($authId, $otherUserId) {
+            $q->where('sender_id', $otherUserId)->where('receiver_id', $authId);
+        })->first();
+
+        if (!$existing) return 'not_friends';
+        if ($existing->accepted) return 'friends';
+        if ($existing->sender_id == $authId) return 'request_sent';
+        if ($existing->receiver_id == $authId) return 'request_received';
+    }
 
 }

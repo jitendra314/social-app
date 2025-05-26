@@ -5,117 +5,196 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\FriendRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class FriendController extends Controller
 {
     public function sendRequest($receiverId)
     {
-        FriendRequest::create([
-            'sender_id' => auth()->id(),
-            'receiver_id' => $receiverId,
-        ]);
+        try {
+            if (FriendRequest::where('sender_id', auth()->id())->where('receiver_id', $receiverId)->exists()) {
+                return back()->with('error', 'Friend request already sent.');
+            }
 
-        return redirect()->back()->with('success', 'Friend request sent.');
+            FriendRequest::create([
+                'sender_id' => auth()->id(),
+                'receiver_id' => $receiverId,
+            ]);
+
+            return redirect()->back()->with('success', 'Friend request sent.');
+        } catch (\Exception $e) {
+            Log::error("Error sending friend request: " . $e->getMessage());
+            return back()->with('error', 'Something went wrong while sending the friend request.');
+        }
     }
 
     public function requests()
     {
-        $requests = FriendRequest::where('receiver_id', auth()->id())
-            ->where('accepted', false)
-            ->with('sender') // Load sender data
-            ->get();
+        try {
+            $requests = FriendRequest::where('receiver_id', auth()->id())
+                ->where('accepted', false)
+                ->with('sender')
+                ->get();
 
-        return view('friends.requests', compact('requests'));
+            return view('friends.requests', compact('requests'));
+        } catch (\Exception $e) {
+            Log::error("Error fetching friend requests: " . $e->getMessage());
+            return back()->with('error', 'Could not load friend requests.');
+        }
     }
-
 
     public function acceptRequest($id)
     {
-        $request = FriendRequest::findOrFail($id);
-        if ($request->receiver_id == auth()->id()) {
-            $request->update(['accepted' => true]);
+        try {
+            $request = FriendRequest::findOrFail($id);
+            if ($request->receiver_id == auth()->id()) {
+                $request->update(['accepted' => true]);
+                return redirect()->back()->with('success', 'Friend request accepted.');
+            }
+            return redirect()->back()->with('error', 'Unauthorized action.');
+        } catch (\Exception $e) {
+            Log::error("Error accepting request: " . $e->getMessage());
+            return back()->with('error', 'Could not accept friend request.');
         }
-        return redirect()->back()->with('success', 'Friend request accepted.');
+    }
+
+    public function cancelRequest($receiverId)
+    {
+        try {
+            FriendRequest::where('sender_id', auth()->id())
+                ->where('receiver_id', $receiverId)
+                ->delete();
+
+            return back()->with('success', 'Friend request canceled.');
+        } catch (\Exception $e) {
+            Log::error("Error canceling request: " . $e->getMessage());
+            return back()->with('error', 'Could not cancel friend request.');
+        }
+    }
+
+
+    public function rejectRequest($id)
+    {
+        try {
+            $request = FriendRequest::where('id', $id)
+                ->where('receiver_id', auth()->id())
+                ->firstOrFail();
+
+            $request->delete();
+
+            return back()->with('success', 'Friend request rejected.');
+        } catch (\Exception $e) {
+            Log::error("Error rejecting request: " . $e->getMessage());
+            return back()->with('error', 'Could not reject friend request.');
+        }
+    }
+
+    public function friendList()
+    {
+        try {
+            $userId = auth()->id();
+
+            $friendIds = FriendRequest::where('accepted', true)
+                ->where(function ($query) use ($userId) {
+                    $query->where('sender_id', $userId)
+                          ->orWhere('receiver_id', $userId);
+                })
+                ->get()
+                ->map(function ($friendRequest) use ($userId) {
+                    return $friendRequest->sender_id === $userId
+                        ? $friendRequest->receiver_id
+                        : $friendRequest->sender_id;
+                });
+
+            $friends = User::whereIn('id', $friendIds)->get();
+
+            return view('friends.list', compact('friends'));
+        } catch (\Exception $e) {
+            Log::error("Error fetching friend list: " . $e->getMessage());
+            return back()->with('error', 'Could not retrieve your friends.');
+        }
     }
 
     public function profile($id)
     {
-        $authUserId = auth()->id();
-        $profileUser = User::findOrFail($id);
+        try {
+            $authUserId = auth()->id();
+            $profileUser = User::findOrFail($id);
 
-        // Get all accepted friends for both users
-        $authFriends = FriendRequest::where('accepted', true)
-            ->where(function ($q) use ($authUserId) {
-                $q->where('sender_id', $authUserId)
-                ->orWhere('receiver_id', $authUserId);
-            })
-            ->get()
-            ->map(function ($fr) use ($authUserId) {
-                return $fr->sender_id == $authUserId ? $fr->receiver_id : $fr->sender_id;
-            })->toArray();
+            $authFriends = FriendRequest::where('accepted', true)
+                ->where(function ($q) use ($authUserId) {
+                    $q->where('sender_id', $authUserId)
+                        ->orWhere('receiver_id', $authUserId);
+                })
+                ->get()
+                ->map(fn($fr) => $fr->sender_id == $authUserId ? $fr->receiver_id : $fr->sender_id)
+                ->toArray();
 
-        $profileFriends = FriendRequest::where('accepted', true)
-            ->where(function ($q) use ($id) {
-                $q->where('sender_id', $id)
-                ->orWhere('receiver_id', $id);
-            })
-            ->get()
-            ->map(function ($fr) use ($id) {
-                return $fr->sender_id == $id ? $fr->receiver_id : $fr->sender_id;
-            })->toArray();
+            $profileFriends = FriendRequest::where('accepted', true)
+                ->where(function ($q) use ($id) {
+                    $q->where('sender_id', $id)
+                        ->orWhere('receiver_id', $id);
+                })
+                ->get()
+                ->map(fn($fr) => $fr->sender_id == $id ? $fr->receiver_id : $fr->sender_id)
+                ->toArray();
 
-        // Intersect both friend lists
-        $mutualFriendIds = array_intersect($authFriends, $profileFriends);
+            $mutualFriendIds = array_values(array_filter(array_intersect($authFriends, $profileFriends), function ($fid) use ($authUserId, $id) {
+                return $fid != $authUserId && $fid != $id;
+            }));
 
-        // Exclude self and profile user from results
-        $mutualFriendIds = array_filter($mutualFriendIds, function ($friendId) use ($authUserId, $id) {
-            return $friendId != $authUserId && $friendId != $id;
-        });
+            $mutualFriends = User::whereIn('id', $mutualFriendIds)->get();
 
-        $mutualFriends = User::whereIn('id', $mutualFriendIds)->get();
+            $friendStatus = $this->getFriendStatus($id);
 
-        return view('users.profile', compact('profileUser', 'mutualFriends'));
-    }
-
-
-
-    public function friendList()
-    {
-        $userId = auth()->id();
-
-        // Get all accepted friendships where the user is either the sender or receiver
-        $friendsIds = FriendRequest::where('accepted', true)
-            ->where(function ($query) use ($userId) {
-                $query->where('sender_id', $userId)
-                    ->orWhere('receiver_id', $userId);
-            })
-            ->get()
-            ->map(function ($friendRequest) use ($userId) {
-                return $friendRequest->sender_id === $userId
-                    ? $friendRequest->receiver_id
-                    : $friendRequest->sender_id;
-            });
-
-        $friends = User::whereIn('id', $friendsIds)->get();
-
-        return view('friends.list', compact('friends'));
+            return view('users.profile', compact('profileUser', 'mutualFriends', 'friendStatus'));
+        } catch (\Exception $e) {
+            Log::error("Error loading profile: " . $e->getMessage());
+            return back()->with('error', 'Could not load profile.');
+        }
     }
 
     public function acceptFromSearch($senderId)
     {
-        $friendRequest = FriendRequest::where('sender_id', $senderId)
-            ->where('receiver_id', auth()->id())
-            ->where('accepted', false)
-            ->first();
+        try {
+            $friendRequest = FriendRequest::where('sender_id', $senderId)
+                ->where('receiver_id', auth()->id())
+                ->where('accepted', false)
+                ->first();
 
-        if ($friendRequest) {
-            $friendRequest->update(['accepted' => true]);
-            return back()->with('success', 'Friend request accepted.');
+            if ($friendRequest) {
+                $friendRequest->update(['accepted' => true]);
+                return back()->with('success', 'Friend request accepted.');
+            }
+
+            return back()->with('error', 'Friend request not found.');
+        } catch (\Exception $e) {
+            Log::error("Error accepting from search: " . $e->getMessage());
+            return back()->with('error', 'Could not accept friend request.');
         }
-
-        return back()->with('error', 'Friend request not found.');
     }
 
+    public function getFriendStatus($otherUserId)
+    {
+        try {
+            $authId = auth()->id();
 
+            $existing = FriendRequest::where(function ($q) use ($authId, $otherUserId) {
+                $q->where('sender_id', $authId)->where('receiver_id', $otherUserId);
+            })->orWhere(function ($q) use ($authId, $otherUserId) {
+                $q->where('sender_id', $otherUserId)->where('receiver_id', $authId);
+            })->first();
 
+            if (!$existing) return 'not_friends';
+            if ($existing->accepted) return 'friends';
+            if ($existing->sender_id == $authId) return 'request_sent';
+            if ($existing->receiver_id == $authId) return 'request_received';
+
+            return 'not_friends';
+        } catch (\Exception $e) {
+            Log::error("Error checking friend status: " . $e->getMessage());
+            return 'error';
+        }
+    }
 }

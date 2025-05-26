@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/friend-request/send/{id}', [FriendController::class, 'sendRequest'])->name('friend.request.send');
     Route::get('/friend-requests', [FriendController::class, 'requests'])->name('friend.requests');
     Route::get('/friend-request/accept/{id}', [FriendController::class, 'acceptRequest'])->name('friend.request.accept');
+    Route::post('/friend-request/cancel/{receiverId}', [FriendController::class, 'cancelRequest'])->name('friend.cancel');
+    Route::delete('/friend-request/reject/{id}', [FriendController::class, 'rejectRequest'])->name('friend.reject');
+
 
     // Profile with mutual friends
     Route::get('/profile/{id}', [FriendController::class, 'profile'])->name('user.profile');

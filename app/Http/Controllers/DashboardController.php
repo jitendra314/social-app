@@ -12,7 +12,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // Users for search (optional: limit to 5 or search query)
+        // 1. Search Users
         $search = $request->input('search');
         $usersQuery = User::where('id', '!=', $user->id);
         if ($search) {
@@ -20,16 +20,32 @@ class DashboardController extends Controller
         }
         $users = $usersQuery->limit(5)->get();
 
-        // Pending friend requests (requests sent to this user)
+        // 2. Pending Friend Requests (received)
         $requests = FriendRequest::where('receiver_id', $user->id)
-                                 ->where('accepted', '0')
-                                 ->with('sender')
-                                 ->get();
+            ->where('accepted', false)
+            ->with('sender')
+            ->get();
 
-        // Friends list (assuming you have a method on User model)
+        // 3. Friends (limit 5)
         $friends = $user->friends()->take(5);
 
-        return view('dashboard', compact('users', 'requests', 'friends', 'search'));
+        // 4. Suggestions (users who are not current friends or have no pending requests)
+        $friendIds = $user->friends()->pluck('id')->toArray();
+        $sentRequestIds = FriendRequest::where('sender_id', $user->id)->pluck('receiver_id')->toArray();
+        $receivedRequestIds = FriendRequest::where('receiver_id', $user->id)->pluck('sender_id')->toArray();
+
+        $excludeIds = array_merge([$user->id], $friendIds, $sentRequestIds, $receivedRequestIds);
+
+        $suggestions = User::whereNotIn('id', $excludeIds)->limit(6)->get();
+        $totalSuggestionsCount = User::whereNotIn('id', $excludeIds)->count();
+
+        return view('dashboard', compact(
+            'users',
+            'requests',
+            'friends',
+            'suggestions',
+            'search',
+            'totalSuggestionsCount'
+        ));
     }
 }
-

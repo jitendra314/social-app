@@ -133,16 +133,15 @@ How to Install Laravel Herd on Windows
 -   Set Up Your Sites Folder
     By default, Herd uses C:\Users\<YourUsername>\Herd\Sites as the folder for your Laravel projects. You can change it in Herd’s settings if you want.
 
-✅ Option B: Add your existing Laravel path as a Site manually
-If you don’t want to move the project:
+### Add your existing Laravel path as a Site manually
 
-In the Herd app, click on Sites → + Add Site.
+-   In the Herd app, click on Sites → + Add Site.
 
-Choose “Add Existing Site”.
+-   Choose “Add Existing Site”.
 
-Browse to your Laravel project’s location (e.g., C:\projects\my-laravel-app).
+-   Browse to your Laravel project’s location (e.g., C:\projects\my-laravel-app).
 
-Give it a name like my-laravel-app.
+-   Give it a name like my-laravel-app.
 
 ## Learning Laravel
 

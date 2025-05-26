@@ -113,6 +113,37 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 -   php artisan optimize:clear
 -   php artisan migrate
 
+## Install Laravel Herd
+
+Laravel Herd provides a secure local environment with HTTPS support, which is essential for Facebook Login because Facebook requires OAuth callbacks to use secure (HTTPS) URLs.
+
+By using Herd’s local .test domains with HTTPS, you can safely develop and test Facebook Login integration on your local machine without exposing your app publicly.
+
+How to Install Laravel Herd on Windows
+
+-   Download Herd
+    Go to https://herd.laravel.com/ and download the Windows installer.
+
+-   Run the Installer
+    Double-click the downloaded .exe file and follow the setup instructions.
+
+-   Open Herd
+    After installation, open the Herd app from your Start menu.
+
+-   Set Up Your Sites Folder
+    By default, Herd uses C:\Users\<YourUsername>\Herd\Sites as the folder for your Laravel projects. You can change it in Herd’s settings if you want.
+
+✅ Option B: Add your existing Laravel path as a Site manually
+If you don’t want to move the project:
+
+In the Herd app, click on Sites → + Add Site.
+
+Choose “Add Existing Site”.
+
+Browse to your Laravel project’s location (e.g., C:\projects\my-laravel-app).
+
+Give it a name like my-laravel-app.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.

@@ -12,11 +12,13 @@ class UserController extends Controller
     {
         $search = $request->input('search');
 
+        // Change from get() to paginate(10) - 10 users per page
         $users = User::where('id', '!=', auth()->id())
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%");
             })
-            ->get();
+            ->paginate(10)
+            ->withQueryString();  // Keep search query on pagination links
 
         $authUserId = auth()->id();
 
@@ -26,7 +28,6 @@ class UserController extends Controller
                 ->orWhere('receiver_id', $authUserId);
         })->get();
 
-        // Build a map of existing requests/friendships
         $friendIds = [];
         $pendingIds = [];
         $receivedRequestIds = [];
@@ -44,7 +45,6 @@ class UserController extends Controller
         }
 
         return view('users.index', compact('users', 'friendIds', 'pendingIds', 'receivedRequestIds'));
-
     }
 
 }

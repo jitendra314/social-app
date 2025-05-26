@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'facebook_id'];
+    protected $fillable = ['name', 'email', 'password', 'facebook_id', 'avatar'];
     protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
@@ -92,5 +92,22 @@ class User extends Authenticatable
         if ($existing->sender_id == $authId) return 'request_sent';
         if ($existing->receiver_id == $authId) return 'request_received';
     }
+
+    public function mutualFriends()
+    {
+        $authUser = auth()->user();
+
+        if (!$authUser) {
+            return collect(); // fallback for unauthenticated access
+        }
+
+        $myFriends = $authUser->friends()->pluck('id');
+        $theirFriends = $this->friends()->pluck('id');
+
+        $mutualIds = $myFriends->intersect($theirFriends);
+
+        return User::whereIn('id', $mutualIds)->get();
+    }
+
 
 }

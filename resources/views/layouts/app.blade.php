@@ -61,8 +61,8 @@
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="me-2">Hi, {{ Auth::user()->name }}</span>
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff&rounded=true&size=32"
-                                    alt="avatar" class="rounded-circle" width="32" height="32">
+                                <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                                    class="rounded-circle" width="40" height="40" alt="Profile Image">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>

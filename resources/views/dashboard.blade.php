@@ -54,9 +54,10 @@
                                     @if ($user->id !== auth()->id())
                                         <li class="list-group-item d-flex align-items-center justify-content-between">
                                             <div class="d-flex align-items-center gap-3">
-                                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random&size=40"
+                                                <img src="{{ $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random&size=40' }}"
                                                     alt="{{ $user->name }} avatar" class="rounded-circle" width="40"
                                                     height="40">
+
                                                 <strong>{{ $user->name }}</strong>
                                             </div>
                                             <div>
@@ -68,7 +69,7 @@
                                                     <!-- Accept Friend Request -->
                                                     <form
                                                         action="{{ route('friend.request.accept.from.search', $user->id) }}"
-                                                        method="POST" class="d-inline">
+                                                        method="GET" class="d-inline">
                                                         @csrf
                                                         <button type="submit" class="btn btn-success btn-sm px-3">
                                                             <i class="bi bi-person-check"></i> Accept
@@ -76,6 +77,9 @@
                                                     </form>
                                                 @elseif (auth()->user()->hasPendingRequestWith($user->id))
                                                     <!-- Cancel Friend Request -->
+                                                    <span class="btn btn-warning btn-sm px-3">
+                                                        <i class="bi bi-person-x"></i> Request Sent
+                                                    </span>
                                                     <form action="{{ route('friend.cancel', $user->id) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
@@ -86,13 +90,11 @@
                                                     </form>
                                                 @else
                                                     <!-- Send Friend Request -->
-                                                    <form action="{{ route('friend.request.send', $user->id) }}"
-                                                        method="POST" class="d-inline">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-outline-primary btn-sm px-3">
-                                                            <i class="bi bi-person-plus"></i> Add Friend
-                                                        </button>
-                                                    </form>
+                                                    <a href="{{ route('friend.request.send', $user->id) }}"
+                                                        class="btn btn-primary btn-sm"
+                                                        title="Send a friend request to {{ $user->name }}">
+                                                        + Add Friend
+                                                    </a>
                                                 @endif
                                             </div>
                                         </li>
@@ -123,13 +125,13 @@
                                 @foreach ($requests as $req)
                                     <li class="list-group-item d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-3">
-                                            <img src="https://ui-avatars.com/api/?name={{ urlencode($req->sender->name) }}&background=random&size=40"
+                                            <img src="{{ $req->sender->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($req->sender->name) . '&background=random&size=40' }}"
                                                 alt="{{ $req->sender->name }} avatar" class="rounded-circle" width="40"
                                                 height="40">
                                             <strong>{{ $req->sender->name }}</strong>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <form action="{{ route('friend.request.accept', $req->id) }}" method="POST">
+                                            <form action="{{ route('friend.request.accept', $req->id) }}" method="GET">
                                                 @csrf
                                                 <button type="submit" class="btn btn-success btn-sm px-3">
                                                     <i class="bi bi-check-circle"></i> Accept
@@ -166,10 +168,13 @@
                                 @foreach ($friends as $friend)
                                     <li class="list-group-item d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-3">
-                                            <img src="https://ui-avatars.com/api/?name={{ urlencode($friend->name) }}&background=random&size=40"
+                                            <img src="{{ $friend->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($friend->name) . '&background=random&size=40' }}"
                                                 alt="{{ $friend->name }} avatar" class="rounded-circle" width="40"
                                                 height="40">
                                             <strong>{{ $friend->name }}</strong>
+
+
+
                                         </div>
                                         <a href="{{ route('user.profile', $friend->id) }}"
                                             class="btn btn-outline-secondary btn-sm px-3">
@@ -196,17 +201,15 @@
                                 @foreach ($suggestions as $user)
                                     @if ($user->id !== auth()->id() && !auth()->user()->isFriendWith($user->id))
                                         <div class="col-6 col-md-3 col-lg-2 text-center">
-                                            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random&size=80"
-                                                alt="{{ $user->name }} avatar" class="rounded-circle mb-2"
-                                                width="80" height="80">
+                                            <img src="{{ $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random&size=40' }}"
+                                                alt="{{ $user->name }} avatar" class="rounded-circle" width="40"
+                                                height="40">
                                             <h6>{{ $user->name }}</h6>
-                                            <form action="{{ route('friend.request.send', $user->id) }}" method="POST"
-                                                class="mb-0">
-                                                @csrf
-                                                <button type="submit" class="btn btn-outline-primary btn-sm px-4">
-                                                    <i class="bi bi-person-plus"></i> Add Friend
-                                                </button>
-                                            </form>
+                                            <a href="{{ route('friend.request.send', $user->id) }}"
+                                                class="btn btn-primary btn-sm"
+                                                title="Send a friend request to {{ $user->name }}">
+                                                + Add Friend
+                                            </a>
                                         </div>
                                     @endif
                                 @endforeach

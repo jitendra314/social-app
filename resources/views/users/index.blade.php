@@ -19,10 +19,14 @@
                 @foreach ($users as $user)
                     <div class="card mb-3 shadow-sm">
                         <div class="card-body d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ $user->name }}</strong>
-                                <br>
-                                <small class="text-muted">Joined {{ $user->created_at->diffForHumans() }}</small>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random&size=40' }}"
+                                    alt="{{ $user->name }} avatar" class="rounded-circle me-3" width="40"
+                                    height="40">
+                                <div>
+                                    <strong>{{ $user->name }}</strong><br>
+                                    <small class="text-muted">Joined {{ $user->created_at->diffForHumans() }}</small>
+                                </div>
                             </div>
                             <div>
                                 @if (in_array($user->id, $friendIds))
@@ -35,6 +39,13 @@
                                         data-bs-placement="top" title="Friend request sent and awaiting confirmation">
                                         ⏳ Request Sent
                                     </button>
+                                    <form action="{{ route('friend.cancel', $user->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-warning btn-sm px-3"
+                                            onclick="return confirm('Cancel friend request?')">
+                                            <i class="bi bi-person-x"></i> Cancel
+                                        </button>
+                                    </form>
                                 @elseif (in_array($user->id, $receivedRequestIds))
                                     <a href="{{ route('friend.request.accept', $user->id) }}" class="btn btn-success btn-sm"
                                         title="Accept friend request from {{ $user->name }}">
@@ -50,6 +61,10 @@
                         </div>
                     </div>
                 @endforeach
+
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $users->links() }}
+                </div>
             @endif
         </div>
     </div>

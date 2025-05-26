@@ -41,7 +41,20 @@
                 <ul class="list-group">
                     @foreach ($mutualFriends as $friend)
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ $friend->name }}
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="{{ $friend->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($friend->name) . '&background=random&size=50' }}"
+                                    alt="{{ $friend->name }} avatar" class="rounded-circle" width="50" height="50">
+
+                                <div>
+                                    <h6 class="mb-0">{{ $friend->name }}</h6>
+                                    <small class="text-muted">{{ $friend->email }}</small><br>
+                                    {{-- Example bio or status --}}
+                                    <small class="text-muted fst-italic">
+                                        {{ $friend->bio ?? 'No bio available' }}
+                                    </small>
+                                </div>
+                            </div>
+
                             <a href="{{ route('user.profile', $friend->id) }}" class="btn btn-sm btn-outline-primary">
                                 View Profile
                             </a>
@@ -51,4 +64,6 @@
             @endif
         </div>
     </div>
+
+
 @endsection

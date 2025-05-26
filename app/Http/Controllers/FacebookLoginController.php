@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Http;
 
 class FacebookLoginController extends Controller
 {
@@ -17,26 +18,45 @@ class FacebookLoginController extends Controller
     {
         try {
             $facebookUser = Socialite::driver('facebook')->stateless()->user();
+            $accessToken = $facebookUser->token;
+            $facebookId = $facebookUser->getId();
 
-            // Check if user with this Facebook ID already exists
-            $user = User::where('facebook_id', $facebookUser->getId())->first();
+            // Get actual Facebook profile picture
+            $response = \Http::get("https://graph.facebook.com/v19.0/{$facebookId}/picture", [
+                'redirect' => false,
+                'type' => 'large',
+                'access_token' => $accessToken,
+            ]);
 
-            // If not, check by email or create a new user
+            $avatarUrl = $response->json('data.url') ?? $facebookUser->getAvatar(); // fallback to default avatar
+
+            // Find user by Facebook ID or email
+            $user = User::where('facebook_id', $facebookId)->first();
+
             if (!$user) {
                 $user = User::where('email', $facebookUser->getEmail())->first();
 
                 if ($user) {
-                    // If user exists by email, update the Facebook ID
                     $user->update([
-                        'facebook_id' => $facebookUser->getId()
+                        'facebook_id' => $facebookId,
+                        'avatar' => $avatarUrl,
                     ]);
                 } else {
-                    // Otherwise, create new user
                     $user = User::create([
                         'name' => $facebookUser->getName(),
-                        'email' => $facebookUser->getEmail() ?? $facebookUser->getId().'@facebook.com', // Fallback email
-                        'facebook_id' => $facebookUser->getId(),
+                        'email' => $facebookUser->getEmail() ?? $facebookId . '@facebook.com',
+                        'facebook_id' => $facebookId,
+                        'avatar' => $avatarUrl,
                         'password' => bcrypt(uniqid()),
+                    ]);
+                }
+            }else{
+                $user = User::where('email', $facebookUser->getEmail())->first();
+
+                if ($user) {
+                    $user->update([
+                        'facebook_id' => $facebookId,
+                        'avatar' => $avatarUrl,
                     ]);
                 }
             }

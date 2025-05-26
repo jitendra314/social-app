@@ -93,21 +93,14 @@ class FriendController extends Controller
     public function friendList()
     {
         try {
-            $userId = auth()->id();
+            $user = auth()->user();
 
-            $friendIds = FriendRequest::where('accepted', true)
-                ->where(function ($query) use ($userId) {
-                    $query->where('sender_id', $userId)
-                          ->orWhere('receiver_id', $userId);
-                })
-                ->get()
-                ->map(function ($friendRequest) use ($userId) {
-                    return $friendRequest->sender_id === $userId
-                        ? $friendRequest->receiver_id
-                        : $friendRequest->sender_id;
-                });
+            // Load both types of friends with pivot data
+            $friendsOfMine = $user->friendsOfMine()->withPivot('created_at')->get();
+            $friendOf = $user->friendOf()->withPivot('created_at')->get();
 
-            $friends = User::whereIn('id', $friendIds)->get();
+            // Merge both and sort by friendship date (optional)
+            $friends = $friendsOfMine->merge($friendOf)->sortByDesc(fn($f) => $f->pivot->created_at);
 
             return view('friends.list', compact('friends'));
         } catch (\Exception $e) {
@@ -115,6 +108,7 @@ class FriendController extends Controller
             return back()->with('error', 'Could not retrieve your friends.');
         }
     }
+
 
     public function profile($id)
     {

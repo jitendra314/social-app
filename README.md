@@ -30,7 +30,7 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 -   cd social-app
 
-Run Below commands:
+### Run Below commands:
 
 -   composer install
 -   npm install
